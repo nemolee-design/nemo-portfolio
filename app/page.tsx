@@ -20,6 +20,7 @@ export default function Home() {
   const [selected, setSelected] = useState<(typeof projects)[number] | null>(null);
   const root = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const projectTrackRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const trailCanvasRef = useRef<HTMLCanvasElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
@@ -46,6 +47,7 @@ export default function Home() {
   }, []);
   const tilt = (e: React.PointerEvent<HTMLElement>) => { const el=e.currentTarget,r=el.getBoundingClientRect(),rx=((e.clientY-r.top)/r.height-.5)*-12,ry=((e.clientX-r.left)/r.width-.5)*14;el.style.setProperty("--rx",`${rx}deg`);el.style.setProperty("--ry",`${ry}deg`);el.style.setProperty("--mx",`${e.clientX-r.left}px`);el.style.setProperty("--my",`${e.clientY-r.top}px`); };
   const untilt = (e: React.PointerEvent<HTMLElement>) => { e.currentTarget.style.setProperty("--rx","0deg");e.currentTarget.style.setProperty("--ry","0deg"); };
+  const horizontalWheel = (e: React.WheelEvent<HTMLDivElement>) => { if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){e.currentTarget.scrollLeft+=e.deltaY;e.preventDefault()} };
   return <main ref={root}>
     <div className="stars"/><div className="cursor-glow" ref={glowRef}/><canvas className="comet-canvas" ref={trailCanvasRef}/><div className="planet-cursor" ref={cursorRef}><i/><span/></div>
     <header><a className="logo" href="#top">YI<span>·</span>DESIGN</a><nav><a href="#work">作品</a><a href="#about">关于</a><a href="mailto:hello@example.com">联系</a></nav><a className="available" href="mailto:hello@example.com"><i/> AVAILABLE FOR WORK</a></header>
@@ -57,10 +59,10 @@ export default function Home() {
     </section>
     <section className="work" id="work">
       <div className="section-head reveal"><div><small>01 / SELECTED WORK</small><h2>精选作品</h2></div></div>
-      <div className="project-list">{projects.map((p) => <article className="project reveal" key={p.id} tabIndex={0} role="button" aria-label={`打开项目 ${p.title}`} onPointerMove={tilt} onPointerLeave={untilt} onClick={()=>setSelected(p)} onKeyDown={e=>{if(e.key==="Enter")setSelected(p)}}>
+      <div className="project-rail"><div className="project-list" ref={projectTrackRef} onWheel={horizontalWheel}>{projects.map((p) => <article className="project reveal" key={p.id} tabIndex={0} role="button" aria-label={`打开项目 ${p.title}`} onPointerMove={tilt} onPointerLeave={untilt} onClick={()=>setSelected(p)} onKeyDown={e=>{if(e.key==="Enter")setSelected(p)}}>
         <div className={`project-visual ${p.tone}`}><Visual mock={p.mock}/><span className="num">{p.id}</span></div>
         <div className="project-info"><div><small>{p.type}</small><h3>{p.title}</h3><p>{p.desc}</p></div><div className="project-meta"><span>{p.meta}</span><span>{p.year}</span><button aria-label={`查看 ${p.title}`}>↗</button></div></div>
-      </article>)}</div>
+      </article>)}</div></div>
     </section>
     <section className="about reveal" id="about"><div className="about-label"><small>02 / ABOUT ME</small><span className="portrait"><i>Y</i></span></div><div className="about-copy"><h2>在逻辑与感性之间，<br/>寻找设计的<em>恰好。</em></h2><p>我有 5 年数字产品设计经验，擅长从复杂问题中梳理清晰路径，并通过细腻的视觉和动效赋予产品温度。工作之外，我用绘画记录那些语言无法描述的感受。</p><div className="skills"><span>Product Design</span><span>Interaction</span><span>Visual Design</span><span>Prototyping</span><span>Illustration</span></div></div></section>
     <footer><div><small>有一个有趣的想法？</small><h2>LET'S MAKE<br/><i>SOMETHING</i> GREAT.</h2></div><a href="mailto:hello@example.com">HELLO@EXAMPLE.COM <b>↗</b></a><div className="footer-bottom"><span>© 2026 YI DESIGN</span><span>BEHANCE · DRIBBBLE · INSTAGRAM</span><a href="#top">BACK TO TOP ↑</a></div></footer>
