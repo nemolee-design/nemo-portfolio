@@ -21,22 +21,33 @@ export default function Home() {
   const root = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
-  const trailRef = useRef<HTMLDivElement>(null);
+  const trailCanvasRef = useRef<HTMLCanvasElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("show")), { threshold: .12 });
     root.current?.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-    let tx = -100, ty = -100, x = -100, y = -100, raf = 0;
+    let tx = -100, ty = -100, x = -100, y = -100, raf = 0, tailOpacity = 0;
+    const points: {x:number;y:number}[] = [];
+    const canvas = trailCanvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    const resize = () => { if(!canvas)return; const dpr=Math.min(devicePixelRatio,2);canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;canvas.style.width=`${innerWidth}px`;canvas.style.height=`${innerHeight}px`;ctx?.setTransform(dpr,0,0,dpr,0,0); };
+    resize(); window.addEventListener("resize",resize);
     const move = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY; cursorRef.current?.classList.add("visible"); glowRef.current?.style.setProperty("--gx", `${tx}px`); glowRef.current?.style.setProperty("--gy", `${ty}px`); const nx=e.clientX/innerWidth-.5,ny=e.clientY/innerHeight-.5; heroRef.current?.style.setProperty("--hero-x",`${nx}`); heroRef.current?.style.setProperty("--hero-y",`${ny}`); };
     const leave = () => cursorRef.current?.classList.remove("visible");
-    const tick = () => { x += (tx-x)*.14; y += (ty-y)*.14; const angle=Math.atan2(ty-y,tx-x)*180/Math.PI; const distance=Math.min(115,Math.hypot(tx-x,ty-y)*1.35+25); if(cursorRef.current) cursorRef.current.style.transform=`translate3d(${tx}px,${ty}px,0)`; if(trailRef.current){trailRef.current.style.width=`${distance}px`;trailRef.current.style.transform=`translate3d(${x}px,${y}px,0) rotate(${angle}deg)`;} raf=requestAnimationFrame(tick); };
+    const tick = () => {
+      const speed=Math.hypot(tx-x,ty-y); x+=(tx-x)*.2;y+=(ty-y)*.2;
+      if(speed>.2){points.unshift({x,y});if(points.length>28)points.pop();tailOpacity=Math.min(1,tailOpacity+.18)}else{tailOpacity*=.91;points.pop()}
+      if(cursorRef.current)cursorRef.current.style.transform=`translate3d(${tx}px,${ty}px,0)`;
+      if(ctx&&canvas){ctx.clearRect(0,0,innerWidth,innerHeight);if(points.length>2&&tailOpacity>.02){const head=points[0],tail=points[points.length-1];const gradient=ctx.createLinearGradient(tail.x,tail.y,head.x,head.y);gradient.addColorStop(0,"rgba(99,83,255,0)");gradient.addColorStop(.55,`rgba(104,126,255,${.25*tailOpacity})`);gradient.addColorStop(1,`rgba(177,247,255,${.95*tailOpacity})`);ctx.beginPath();ctx.moveTo(tail.x,tail.y);for(let i=points.length-2;i>0;i--){const p=points[i],n=points[i-1];ctx.quadraticCurveTo(p.x,p.y,(p.x+n.x)/2,(p.y+n.y)/2)}ctx.quadraticCurveTo(points[1].x,points[1].y,head.x,head.y);ctx.strokeStyle=gradient;ctx.lineWidth=5;ctx.lineCap="round";ctx.shadowColor="#7feaff";ctx.shadowBlur=13;ctx.stroke();ctx.shadowBlur=0}}
+      raf=requestAnimationFrame(tick);
+    };
     window.addEventListener("pointermove", move); document.documentElement.addEventListener("mouseleave", leave); tick();
-    return () => { observer.disconnect(); window.removeEventListener("pointermove", move); document.documentElement.removeEventListener("mouseleave", leave); cancelAnimationFrame(raf); };
+    return () => { observer.disconnect(); window.removeEventListener("pointermove", move); window.removeEventListener("resize",resize); document.documentElement.removeEventListener("mouseleave", leave); cancelAnimationFrame(raf); };
   }, []);
   const tilt = (e: React.PointerEvent<HTMLElement>) => { const el=e.currentTarget,r=el.getBoundingClientRect(),rx=((e.clientY-r.top)/r.height-.5)*-12,ry=((e.clientX-r.left)/r.width-.5)*14;el.style.setProperty("--rx",`${rx}deg`);el.style.setProperty("--ry",`${ry}deg`);el.style.setProperty("--mx",`${e.clientX-r.left}px`);el.style.setProperty("--my",`${e.clientY-r.top}px`); };
   const untilt = (e: React.PointerEvent<HTMLElement>) => { e.currentTarget.style.setProperty("--rx","0deg");e.currentTarget.style.setProperty("--ry","0deg"); };
   return <main ref={root}>
-    <div className="stars"/><div className="cursor-glow" ref={glowRef}/><div className="comet-tail" ref={trailRef}/><div className="planet-cursor" ref={cursorRef}><i/><span/></div>
+    <div className="stars"/><div className="cursor-glow" ref={glowRef}/><canvas className="comet-canvas" ref={trailCanvasRef}/><div className="planet-cursor" ref={cursorRef}><i/><span/></div>
     <header><a className="logo" href="#top">YI<span>·</span>DESIGN</a><nav><a href="#work">作品</a><a href="#about">关于</a><a href="mailto:hello@example.com">联系</a></nav><a className="available" href="mailto:hello@example.com"><i/> AVAILABLE FOR WORK</a></header>
     <section className="hero" id="top" ref={heroRef}>
       <div className="hero-kicker"><span>UI / UX & INTERACTION DESIGNER</span><span>BASED IN SHANGHAI · 2026</span></div>
