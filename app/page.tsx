@@ -18,16 +18,23 @@ function Visual({ mock }: { mock: string }) {
 
 export default function Home() {
   const [filter, setFilter] = useState("全部");
-  const [cursor, setCursor] = useState({ x: -100, y: -100, active: false });
   const root = useRef<HTMLElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const trailRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("show")), { threshold: .12 });
     root.current?.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+    let tx = -100, ty = -100, x = -100, y = -100, raf = 0;
+    const move = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY; cursorRef.current?.classList.add("visible"); glowRef.current?.style.setProperty("--gx", `${tx}px`); glowRef.current?.style.setProperty("--gy", `${ty}px`); };
+    const leave = () => cursorRef.current?.classList.remove("visible");
+    const tick = () => { x += (tx-x)*.14; y += (ty-y)*.14; if(cursorRef.current) cursorRef.current.style.transform=`translate3d(${tx}px,${ty}px,0)`; if(trailRef.current) trailRef.current.style.transform=`translate3d(${x}px,${y}px,0)`; raf=requestAnimationFrame(tick); };
+    window.addEventListener("pointermove", move); document.documentElement.addEventListener("mouseleave", leave); tick();
+    return () => { observer.disconnect(); window.removeEventListener("pointermove", move); document.documentElement.removeEventListener("mouseleave", leave); cancelAnimationFrame(raf); };
   }, []);
   const visible = filter === "全部" ? projects : projects.filter(p => p.type.startsWith(filter === "应用" ? "APP" : filter === "网页" ? "WEB" : "ART"));
-  return <main ref={root} onMouseMove={e => setCursor({ x: e.clientX, y: e.clientY, active: cursor.active })}>
-    <div className={`cursor ${cursor.active ? "active" : ""}`} style={{ transform: `translate(${cursor.x}px,${cursor.y}px)` }}>VIEW</div>
+  return <main ref={root}>
+    <div className="stars"/><div className="cursor-glow" ref={glowRef}/><div className="comet-tail" ref={trailRef}/><div className="planet-cursor" ref={cursorRef}><i/><span/></div>
     <header><a className="logo" href="#top">YI<span>·</span>DESIGN</a><nav><a href="#work">作品</a><a href="#about">关于</a><a href="mailto:hello@example.com">联系</a></nav><a className="available" href="mailto:hello@example.com"><i/> AVAILABLE FOR WORK</a></header>
     <section className="hero" id="top">
       <div className="hero-kicker"><span>UI / UX & INTERACTION DESIGNER</span><span>BASED IN SHANGHAI · 2026</span></div>
@@ -38,7 +45,7 @@ export default function Home() {
     <section className="work" id="work">
       <div className="section-head reveal"><div><small>01 / SELECTED WORK</small><h2>精选作品</h2></div><div className="filters">{["全部","应用","网页","绘画"].map(x => <button className={filter===x?"on":""} onClick={()=>setFilter(x)} key={x}>{x}</button>)}</div></div>
       <div className="project-list">{visible.map((p, idx) => <article className="project reveal" key={p.id}>
-        <div className={`project-visual ${p.tone}`} onMouseEnter={()=>setCursor(c=>({...c,active:true}))} onMouseLeave={()=>setCursor(c=>({...c,active:false}))}><Visual mock={p.mock}/><span className="num">{p.id}</span></div>
+        <div className={`project-visual ${p.tone}`}><Visual mock={p.mock}/><span className="num">{p.id}</span></div>
         <div className="project-info"><div><small>{p.type}</small><h3>{p.title}</h3><p>{p.desc}</p></div><div className="project-meta"><span>{p.meta}</span><span>{p.year}</span><button aria-label={`查看 ${p.title}`}>↗</button></div></div>
       </article>)}</div>
     </section>
