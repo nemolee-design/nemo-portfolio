@@ -16,6 +16,15 @@ function Visual({ mock }: { mock: string }) {
   return <div className="notes-mock"><div className="map-line"/><div className="note-card"><small>KYOTO · DAY 03</small><strong>在陌生城市里<br/>收集微小灵感</strong><span>12 places saved</span></div></div>;
 }
 
+function CaseGallery({ project }: { project: (typeof projects)[number] }) {
+  return <div className="case-gallery">
+    <div className={`case-shot case-shot-main ${project.tone}`}><Visual mock={project.mock}/><span>01 / HERO VIEW</span></div>
+    <div className={`case-shot case-shot-detail ${project.tone}`}><div className="detail-orbit"><i/><i/><i/><b>{project.id}</b></div><span>02 / VISUAL SYSTEM</span></div>
+    <div className="case-shot case-shot-flow"><div className="flow-ui"><small>USER FLOW</small><strong>Discover<br/>Explore<br/>Complete</strong><i/><i/><i/></div><span>03 / EXPERIENCE FLOW</span></div>
+    <div className={`case-shot case-shot-pair ${project.tone}`}><div><Visual mock={project.mock}/></div><div><small>DESIGN DETAIL</small><strong>{project.title}</strong><p>{project.desc}</p></div><span>04 / FINAL EXPERIENCE</span></div>
+  </div>;
+}
+
 export default function Home() {
   const [selected, setSelected] = useState<(typeof projects)[number] | null>(null);
   const [closingCase, setClosingCase] = useState(false);
@@ -71,6 +80,6 @@ export default function Home() {
     </section>
     <section className="about reveal stagger-group depth-section" id="about"><div className="about-label rise-item depth-near"><small>02 / ABOUT ME</small><span className="portrait"><i>Y</i></span></div><div className="about-copy depth-far"><h2 className="rise-item">在逻辑与感性之间，<br/>寻找设计的<em>恰好。</em></h2><p className="rise-item">我有 5 年数字产品设计经验，擅长从复杂问题中梳理清晰路径，并通过细腻的视觉和动效赋予产品温度。工作之外，我用绘画记录那些语言无法描述的感受。</p><div className="skills rise-item"><span>Product Design</span><span>Interaction</span><span>Visual Design</span><span>Prototyping</span><span>Illustration</span></div></div></section>
     <footer className="stagger-group depth-section"><div className="depth-far"><small className="rise-item">有一个有趣的想法？</small><h2 className="rise-item">LET'S MAKE<br/><i>SOMETHING</i> GREAT.</h2></div><a className="rise-item depth-near" href="mailto:hello@example.com">HELLO@EXAMPLE.COM <b>↗</b></a><div className="footer-bottom rise-item"><span>© 2026 YI DESIGN</span><span>BEHANCE · DRIBBBLE · INSTAGRAM</span><a href="#top">BACK TO TOP ↑</a></div></footer>
-    {selected&&<div className={`case-overlay ${closingCase?"case-closing":""}`} role="dialog" aria-modal="true" aria-label={selected.title}><button className="case-close" onClick={closeCase}>关闭 ×</button><div className="case-shell"><div className={`case-hero ${selected.tone}`}><Visual mock={selected.mock}/><span>{selected.id} / {selected.year}</span></div><div className="case-copy"><small>{selected.type}</small><h2>{selected.title}</h2><p>{selected.desc}</p><div className="case-facts"><span>角色<br/><b>{selected.meta}</b></span><span>周期<br/><b>8–12 周</b></span><span>成果<br/><b>体验提升 32%</b></span></div><h3>从问题出发，建立清晰而有温度的体验。</h3><p>这是项目详情页的首版结构。之后可以替换为真实的项目背景、研究过程、用户旅程、设计系统与最终成果，让每个案例成为完整的设计叙事。</p></div></div></div>}
+    {selected&&<div className={`case-overlay ${closingCase?"case-closing":""}`} role="dialog" aria-modal="true" aria-label={selected.title}><button className="case-close" onClick={closeCase}>关闭 ×</button><div className="case-shell"><CaseGallery project={selected}/><div className="case-copy"><small>{selected.type}</small><h2>{selected.title}</h2><p>{selected.desc}</p><div className="case-facts"><span>角色<br/><b>{selected.meta}</b></span><span>周期<br/><b>8–12 周</b></span><span>成果<br/><b>体验提升 32%</b></span></div><h3>从问题出发，建立清晰而有温度的体验。</h3><p>这是项目详情页的首版结构。之后可以替换为真实的项目背景、研究过程、用户旅程、设计系统与最终成果，让每个案例成为完整的设计叙事。</p></div></div></div>}
   </main>;
 }
