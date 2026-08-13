@@ -52,13 +52,16 @@ export default function Home() {
     <div className="stars"/><div className="cursor-glow" ref={glowRef}/><canvas className="comet-canvas" ref={trailCanvasRef}/><div className="planet-cursor" ref={cursorRef}><i/><span/></div>
     <header><a className="logo" href="#top">YI<span>·</span>DESIGN</a><nav><a href="#work">作品</a><a href="#about">关于</a><a href="mailto:hello@example.com">联系</a></nav><a className="available" href="mailto:hello@example.com"><i/> AVAILABLE FOR WORK</a></header>
     <section className="hero" id="top" ref={heroRef}>
+      <div className="cosmos-depth cosmos-far"><i/><i/><i/><i/><i/><i/></div>
+      <div className="cosmos-depth cosmos-mid"><i/><i/><i/><i/></div>
+      <div className="glass-cosmos" aria-hidden="true"><span/><span/><span/><b/></div>
+      <div className="cosmos-depth cosmos-near"><i/><i/><i/></div>
       <div className="hero-kicker"><span>UI / UX & INTERACTION DESIGNER</span><span>BASED IN SHANGHAI · 2026</span></div>
-      <h1><span className="line"><em>Designing</em> meaningful</span><span className="line offset">digital <i>experiences.</i></span></h1>
+      <h1><span className="line hero-whisper">STEP INTO</span><span className="line hero-main">NEMO <i>UNIVERSE</i></span></h1>
       <div className="hero-bottom"><p>你好，我是 <b>Yi</b>。一名专注于数字产品与交互体验的设计师，<br/>相信好的设计应该清晰、克制，也让人感到愉悦。</p><a href="#work" className="scroll">向下探索 <i>↓</i></a></div>
-      <div className="float-shape"><span/><span/><span/></div>
     </section>
     <section className="work" id="work">
-      <div className="section-head reveal"><div><small>01 / SELECTED WORK</small><h2>精选作品</h2></div></div>
+      <div className="section-head reveal"><div><small>01 / SELECTED WORK</small></div></div>
       <div className="project-rail"><div className="project-list" ref={projectTrackRef} onWheel={horizontalWheel}>{projects.map((p) => <article className="project reveal" key={p.id} tabIndex={0} role="button" aria-label={`打开项目 ${p.title}`} onPointerMove={tilt} onPointerLeave={untilt} onClick={()=>setSelected(p)} onKeyDown={e=>{if(e.key==="Enter")setSelected(p)}}>
         <div className={`project-visual ${p.tone}`}><Visual mock={p.mock}/><span className="num">{p.id}</span></div>
         <div className="project-info"><div><small>{p.type}</small><h3>{p.title}</h3><p>{p.desc}</p></div><div className="project-meta"><span>{p.meta}</span><span>{p.year}</span><button aria-label={`查看 ${p.title}`}>↗</button></div></div>
