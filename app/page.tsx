@@ -26,7 +26,7 @@ export default function Home() {
   const glowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("show")), { threshold: .12 });
-    root.current?.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+    root.current?.querySelectorAll<HTMLElement>(".reveal,.stagger-group,footer").forEach((el,groupIndex) => { el.querySelectorAll<HTMLElement>(".rise-item").forEach((item,i)=>{item.style.setProperty("--rise",`${36+((i*23+groupIndex*17)%54)}px`);item.style.setProperty("--drift",`${((i*37+groupIndex*19)%31)-15}px`);item.style.setProperty("--delay",`${i*90+((i*29)%60)}ms`)});observer.observe(el); });
     let tx = -100, ty = -100, x = -100, y = -100, raf = 0, tailOpacity = 0;
     const points: {x:number;y:number}[] = [];
     const canvas = trailCanvasRef.current;
@@ -61,14 +61,14 @@ export default function Home() {
       <div className="hero-bottom"><p>你好，我是 <b>Yi</b>。一名专注于数字产品与交互体验的设计师，<br/>相信好的设计应该清晰、克制，也让人感到愉悦。</p><a href="#work" className="scroll">向下探索 <i>↓</i></a></div>
     </section>
     <section className="work" id="work">
-      <div className="section-head reveal"><div><small>01 / SELECTED WORK</small></div></div>
-      <div className="project-rail"><div className="project-list" ref={projectTrackRef} onWheel={horizontalWheel}>{projects.map((p) => <article className="project reveal" key={p.id} tabIndex={0} role="button" aria-label={`打开项目 ${p.title}`} onPointerMove={tilt} onPointerLeave={untilt} onClick={()=>setSelected(p)} onKeyDown={e=>{if(e.key==="Enter")setSelected(p)}}>
+      <div className="section-head reveal stagger-group"><div className="rise-item"><small>01 / SELECTED WORK</small></div></div>
+      <div className="project-rail"><div className="project-list" ref={projectTrackRef} onWheel={horizontalWheel}>{projects.map((p) => <article className="project reveal rise-item" key={p.id} tabIndex={0} role="button" aria-label={`打开项目 ${p.title}`} onPointerMove={tilt} onPointerLeave={untilt} onClick={()=>setSelected(p)} onKeyDown={e=>{if(e.key==="Enter")setSelected(p)}}>
         <div className={`project-visual ${p.tone}`}><Visual mock={p.mock}/><span className="num">{p.id}</span></div>
         <div className="project-info"><div><small>{p.type}</small><h3>{p.title}</h3><p>{p.desc}</p></div><div className="project-meta"><span>{p.meta}</span><span>{p.year}</span><button aria-label={`查看 ${p.title}`}>↗</button></div></div>
       </article>)}</div></div>
     </section>
-    <section className="about reveal" id="about"><div className="about-label"><small>02 / ABOUT ME</small><span className="portrait"><i>Y</i></span></div><div className="about-copy"><h2>在逻辑与感性之间，<br/>寻找设计的<em>恰好。</em></h2><p>我有 5 年数字产品设计经验，擅长从复杂问题中梳理清晰路径，并通过细腻的视觉和动效赋予产品温度。工作之外，我用绘画记录那些语言无法描述的感受。</p><div className="skills"><span>Product Design</span><span>Interaction</span><span>Visual Design</span><span>Prototyping</span><span>Illustration</span></div></div></section>
-    <footer><div><small>有一个有趣的想法？</small><h2>LET'S MAKE<br/><i>SOMETHING</i> GREAT.</h2></div><a href="mailto:hello@example.com">HELLO@EXAMPLE.COM <b>↗</b></a><div className="footer-bottom"><span>© 2026 YI DESIGN</span><span>BEHANCE · DRIBBBLE · INSTAGRAM</span><a href="#top">BACK TO TOP ↑</a></div></footer>
+    <section className="about reveal stagger-group" id="about"><div className="about-label rise-item"><small>02 / ABOUT ME</small><span className="portrait"><i>Y</i></span></div><div className="about-copy"><h2 className="rise-item">在逻辑与感性之间，<br/>寻找设计的<em>恰好。</em></h2><p className="rise-item">我有 5 年数字产品设计经验，擅长从复杂问题中梳理清晰路径，并通过细腻的视觉和动效赋予产品温度。工作之外，我用绘画记录那些语言无法描述的感受。</p><div className="skills rise-item"><span>Product Design</span><span>Interaction</span><span>Visual Design</span><span>Prototyping</span><span>Illustration</span></div></div></section>
+    <footer className="stagger-group"><div><small className="rise-item">有一个有趣的想法？</small><h2 className="rise-item">LET'S MAKE<br/><i>SOMETHING</i> GREAT.</h2></div><a className="rise-item" href="mailto:hello@example.com">HELLO@EXAMPLE.COM <b>↗</b></a><div className="footer-bottom rise-item"><span>© 2026 YI DESIGN</span><span>BEHANCE · DRIBBBLE · INSTAGRAM</span><a href="#top">BACK TO TOP ↑</a></div></footer>
     {selected&&<div className="case-overlay" role="dialog" aria-modal="true" aria-label={selected.title}><button className="case-close" onClick={()=>setSelected(null)}>关闭 ×</button><div className="case-shell"><div className={`case-hero ${selected.tone}`}><Visual mock={selected.mock}/><span>{selected.id} / {selected.year}</span></div><div className="case-copy"><small>{selected.type}</small><h2>{selected.title}</h2><p>{selected.desc}</p><div className="case-facts"><span>角色<br/><b>{selected.meta}</b></span><span>周期<br/><b>8–12 周</b></span><span>成果<br/><b>体验提升 32%</b></span></div><h3>从问题出发，建立清晰而有温度的体验。</h3><p>这是项目详情页的首版结构。之后可以替换为真实的项目背景、研究过程、用户旅程、设计系统与最终成果，让每个案例成为完整的设计叙事。</p></div></div></div>}
   </main>;
 }
